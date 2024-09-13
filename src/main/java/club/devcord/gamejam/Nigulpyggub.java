@@ -17,7 +17,7 @@ public class Nigulpyggub extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        lagger.stop();
     }
 
     @Override
