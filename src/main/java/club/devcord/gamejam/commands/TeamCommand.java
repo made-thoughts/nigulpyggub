@@ -52,7 +52,7 @@ public class TeamCommand implements TabExecutor {
                 }
 
                 World teamWorld = duplicator.duplicate(player.getName());
-                Team team = new Team(player, List.of(), teamWorld);
+                Team team = new Team(player, new ArrayList<>(), teamWorld);
                 plugin.teams().add(team);
                 player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team with name %s created".formatted(player.getName())));
             }

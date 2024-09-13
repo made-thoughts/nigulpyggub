@@ -7,10 +7,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class WorldDuplicator {
@@ -54,6 +51,7 @@ public class WorldDuplicator {
 
     private void recursiveDelete(Path path) {
         try {
+            if (Files.notExists(path)) return;
             Files.walkFileTree(path,
                     new SimpleFileVisitor<>() {
                         @Override
