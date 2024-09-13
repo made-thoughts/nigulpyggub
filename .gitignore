@@ -149,3 +149,5 @@ gradle-app.setting
 .direnv
 shell.nix
 run
+
+.gradle/file-system.probe

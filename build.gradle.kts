@@ -78,8 +78,8 @@ tasks {
 }
 
 bukkit {
-    name = "Nigulpygubb"
+    name = "Nigulpyggub"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
-    main = "club.devcord.gamejam.Nigulpygubb"
+    main = "club.devcord.gamejam.Nigulpyggub"
     apiVersion = "1.21"
 }
