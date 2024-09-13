@@ -82,4 +82,13 @@ bukkit {
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
     main = "club.devcord.gamejam.Nigulpyggub"
     apiVersion = "1.21"
+
+    commands {
+        register("team") {
+            description = "Overall team management command"
+        }
+        register("game") {
+            description = "Overall game management command"
+        }
+    }
 }
