@@ -5,6 +5,8 @@ import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class PlayerJoinListener implements Listener {
 
@@ -17,5 +19,6 @@ public class PlayerJoinListener implements Listener {
         }
 
         event.getPlayer().setResourcePack("https://panel.traidio.net/resourcepack.zip");
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 2, 100, false, false));
     }
 }

@@ -28,16 +28,9 @@ public class MoveListener implements Listener {
         if (!team.players().contains(event.getPlayer())) return;
 
         Location location = event.getTo();
-        Player player = event.getPlayer();
 
         if(location.blockX() == -230 && location.blockY() > 64 && location.blockZ() == -683) {
-            var item = new ItemStack(Material.ENDER_EYE);
-            var meta = item.getItemMeta();
-            meta.displayName(MiniMessage.miniMessage().deserialize("<rainbow>Sehhilfe"));
-            item.setItemMeta(meta);
-            team.players().forEach(p -> {
-                p.getInventory().addItem(item);
-            });
+            team.players().forEach(p -> p.getInventory().addItem(TheJumpLevel.THE_EYE));
             levelPipeline.next();
         }
     }

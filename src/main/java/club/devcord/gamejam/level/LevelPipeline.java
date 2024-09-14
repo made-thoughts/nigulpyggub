@@ -2,6 +2,7 @@ package club.devcord.gamejam.level;
 
 import club.devcord.gamejam.Nigulpyggub;
 import club.devcord.gamejam.Team;
+import club.devcord.gamejam.level.eyes.EyesLevel;
 import club.devcord.gamejam.level.poempel.PoempelLevel;
 import club.devcord.gamejam.level.thejump.TheJumpLevel;
 import net.kyori.adventure.key.Key;
@@ -19,7 +20,8 @@ public class LevelPipeline {
         this.team = team;
         var levels = List.of(
                 new PoempelLevel(team, plugin, this),
-                new TheJumpLevel(team, plugin, this)
+                new TheJumpLevel(team, plugin, this),
+                new EyesLevel(team, plugin, this)
         );
         this.levels = new ArrayDeque<>(levels);
     }
@@ -41,6 +43,7 @@ public class LevelPipeline {
     }
 
     public void stop() {
+        if (levels.peek() == null) return;
         levels.peek().stop();
     }
 }

@@ -8,6 +8,7 @@ import club.devcord.gamejam.level.poempel.PoempelLevel;
 import club.devcord.gamejam.world.WorldDuplicator;
 import io.papermc.paper.configuration.type.fallback.FallbackValue;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GameCommand implements CommandExecutor {
 
@@ -36,7 +38,7 @@ public class GameCommand implements CommandExecutor {
             return false;
         }
 
-        if (args.length != 1) {
+        if (args.length < 1) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have to use: /game start"));
             return false;
         }
@@ -68,6 +70,17 @@ public class GameCommand implements CommandExecutor {
                             playerLocation.setWorld(world);
                             p.teleport(playerLocation);
                         });
+//                plugin.teams().stream().map(Team::world).forEach(w -> plugin.getServer().unloadWorld(w, false));
+                plugin.teamPipelines().clear();
+            }
+            case "level" -> {
+                Optional<Team> team = plugin.teamForPlayer(player);
+                LevelPipeline pipeline = plugin.teamPipelines().get(team.orElseThrow());
+
+                int level = Integer.parseInt(args[1]);
+                for (int i = 0; i < level; i++) {
+                    pipeline.next();
+                }
             }
             default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Unknown command."));
         }

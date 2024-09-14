@@ -22,13 +22,13 @@ public class WorldDuplicator {
     public World duplicate(String name) {
         String worldName = "world_" + name;
         Path worldPath = Path.of(worldName);
-        var existingWorld = Bukkit.getWorld(worldName);
+        var existingWorld = plugin.getServer().getWorld(worldName);
         if(existingWorld != null) {
-            Bukkit.unloadWorld(existingWorld, false);
+            plugin.getServer().unloadWorld(existingWorld, false);
         }
         recursiveDelete(worldPath);
         recursiveCopy(defaultWorld, worldPath);
-        return Bukkit.createWorld(WorldCreator.name(worldName));
+        return plugin.getServer().createWorld(WorldCreator.name(worldName));
     }
 
     private void recursiveCopy(Path from, Path to) {

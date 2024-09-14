@@ -12,20 +12,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Nigulpyggub extends JavaPlugin {
 
     private final Map<Team, LevelPipeline> teamPipelines = new HashMap<>();
-    private final Lagger lagger = new Lagger(this);
-
-    @Override
-    public void onDisable() {
-        lagger.stop();
-    }
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        getServer().getPluginManager().registerEvents(new EventCancelers(), this);
         getServer().getPluginCommand("team").setExecutor(new TeamCommand(this));
         getServer().getPluginCommand("game").setExecutor(new GameCommand(this));
 //        lagger.start();
@@ -51,10 +47,6 @@ public class Nigulpyggub extends JavaPlugin {
 
     public Map<Team, LevelPipeline> teamPipelines() {
         return teamPipelines;
-    }
-
-    public Lagger lagger() {
-        return lagger;
     }
 
     public Component exceptionToComponent(Throwable throwable) {
