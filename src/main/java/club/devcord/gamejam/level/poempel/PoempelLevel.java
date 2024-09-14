@@ -14,7 +14,7 @@ public class PoempelLevel extends Level {
     private final MoveListener moveListener = new MoveListener();
     private final Nigulpyggub plugin;
 
-    protected PoempelLevel(Team team, Nigulpyggub plugin) {
+    public PoempelLevel(Team team, Nigulpyggub plugin) {
         super(team);
         this.plugin = plugin;
     }

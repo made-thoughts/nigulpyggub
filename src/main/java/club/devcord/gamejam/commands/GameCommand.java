@@ -2,6 +2,8 @@ package club.devcord.gamejam.commands;
 
 import club.devcord.gamejam.Nigulpyggub;
 import club.devcord.gamejam.Team;
+import club.devcord.gamejam.level.Level;
+import club.devcord.gamejam.level.poempel.PoempelLevel;
 import club.devcord.gamejam.world.WorldDuplicator;
 import io.papermc.paper.configuration.type.fallback.FallbackValue;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -40,9 +42,10 @@ public class GameCommand implements CommandExecutor {
             case "start" -> {
                 for (Team team : plugin.teams()) {
                     team.players().forEach(teamPlayer -> teamPlayer.setGameMode(GameMode.ADVENTURE));
+
+                    PoempelLevel poempelLevel = new PoempelLevel(team, plugin);
+                    poempelLevel.start();
                 }
-
-
 
             }
             default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Unknown command."));

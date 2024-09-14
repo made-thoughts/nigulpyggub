@@ -6,7 +6,7 @@ public abstract class Level {
 
     private final Team team;
 
-    protected Level(Team team) {
+    public Level(Team team) {
         this.team = team;
     }
 
