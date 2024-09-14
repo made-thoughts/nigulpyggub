@@ -41,7 +41,7 @@ public class Lagger {
     private void lagPlayers() {
         plugin.getServer().getOnlinePlayers().forEach(player -> {
             var locations = playerLocations.getOrDefault(player, new ArrayList<>());
-            if(random.nextInt(0, 100) < 5 && !locations.isEmpty()) {
+            if(random.nextInt(0, 100) < 30 && !locations.isEmpty()) {
                 var location = locations.get(random.nextInt(locations.size()));
                 player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }

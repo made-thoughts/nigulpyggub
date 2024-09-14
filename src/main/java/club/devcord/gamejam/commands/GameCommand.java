@@ -3,6 +3,7 @@ package club.devcord.gamejam.commands;
 import club.devcord.gamejam.Nigulpyggub;
 import club.devcord.gamejam.Team;
 import club.devcord.gamejam.world.WorldDuplicator;
+import io.papermc.paper.configuration.type.fallback.FallbackValue;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -40,6 +41,9 @@ public class GameCommand implements CommandExecutor {
                 for (Team team : plugin.teams()) {
                     team.players().forEach(teamPlayer -> teamPlayer.setGameMode(GameMode.ADVENTURE));
                 }
+
+
+
             }
             default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Unknown command."));
         }

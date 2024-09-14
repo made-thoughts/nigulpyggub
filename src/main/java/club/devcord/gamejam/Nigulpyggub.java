@@ -3,9 +3,19 @@ package club.devcord.gamejam;
 
 import club.devcord.gamejam.commands.GameCommand;
 import club.devcord.gamejam.commands.TeamCommand;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.C;
 
+import java.awt.*;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +35,7 @@ public class Nigulpyggub extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginCommand("team").setExecutor(new TeamCommand(this));
         getServer().getPluginCommand("game").setExecutor(new GameCommand(this));
+//        lagger.start();
     }
 
     public Optional<Team> teamForName(String name) {
@@ -45,5 +56,13 @@ public class Nigulpyggub extends JavaPlugin {
 
     public Lagger lagger() {
         return lagger;
+    }
+
+    public Component exceptionToComponent(Throwable throwable) {
+        var writer = new StringWriter();
+        var output = new PrintWriter(writer);
+        throwable.printStackTrace(output);
+
+        return Component.text(writer.toString()).color(NamedTextColor.RED);
     }
 }
