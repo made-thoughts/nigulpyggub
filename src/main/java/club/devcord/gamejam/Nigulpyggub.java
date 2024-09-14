@@ -3,26 +3,19 @@ package club.devcord.gamejam;
 
 import club.devcord.gamejam.commands.GameCommand;
 import club.devcord.gamejam.commands.TeamCommand;
+import club.devcord.gamejam.level.LevelPipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.C;
 
-import java.awt.*;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Nigulpyggub extends JavaPlugin {
 
-    private final List<Team> teams = new ArrayList<>();
+    private final Map<Team, LevelPipeline> teamPipelines = new HashMap<>();
     private final Lagger lagger = new Lagger(this);
 
     @Override
@@ -39,19 +32,25 @@ public class Nigulpyggub extends JavaPlugin {
     }
 
     public Optional<Team> teamForName(String name) {
-        return teams.stream()
-                .filter(team -> team.creator().getName().equalsIgnoreCase(name))
+        return teamPipelines.keySet()
+                .stream()
+                .filter(team -> team.name().equalsIgnoreCase(name))
                 .findAny();
     }
 
     public Optional<Team> teamForPlayer(Player player) {
-        return teams.stream()
+        return teamPipelines.keySet()
+                .stream()
                 .filter(team -> team.players().contains(player))
                 .findAny();
     }
 
-    public List<Team> teams() {
-        return teams;
+    public Set<Team> teams() {
+        return teamPipelines.keySet();
+    }
+
+    public Map<Team, LevelPipeline> teamPipelines() {
+        return teamPipelines;
     }
 
     public Lagger lagger() {

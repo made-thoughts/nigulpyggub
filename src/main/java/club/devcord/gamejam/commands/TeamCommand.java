@@ -3,7 +3,10 @@ package club.devcord.gamejam.commands;
 import club.devcord.gamejam.Nigulpyggub;
 import club.devcord.gamejam.Team;
 import club.devcord.gamejam.world.WorldDuplicator;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.world.scores.PlayerTeam;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -15,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TeamCommand implements TabExecutor {
 
@@ -52,8 +57,8 @@ public class TeamCommand implements TabExecutor {
                 }
 
                 World teamWorld = duplicator.duplicate(player.getName());
-                Team team = new Team(player, new ArrayList<>(), teamWorld);
-                plugin.teams().add(team);
+                Team team = new Team(player, teamWorld);
+                plugin.teamPipelines().put(team, null);
                 player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team with name %s created".formatted(player.getName())));
             }
             case "join" -> {
@@ -68,10 +73,18 @@ public class TeamCommand implements TabExecutor {
                 }
 
                 plugin.teamForName(args[1]).ifPresentOrElse(team -> {
+                    team.players().forEach(p -> p.sendMessage(MiniMessage.miniMessage().deserialize("<green>%s joined the team".formatted(player.getName()))));
                     team.addPlayer(player);
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<green>You joined the team of %s".formatted(team.creator().getName())));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<green>You joined the team %s".formatted(team.name())));
                 }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>No team found for creator %s".formatted(args[1]))));
             }
+            case "info" -> plugin.teamForPlayer(player)
+                    .ifPresentOrElse(team -> {
+                        TextComponent text = Component.text("Your team: %s".formatted(team.name()))
+                                .append(Component.newline())
+                                .append(Component.text("Members: %s".formatted(team.players().stream().map(Player::getName).collect(Collectors.joining(", ")))));
+                        player.sendMessage(text);
+                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You're not in a team!")));
             case "tp" -> {
                 if (!player.isOp()) {
                     player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst mehr Rechte tanken."));
@@ -95,6 +108,14 @@ public class TeamCommand implements TabExecutor {
                         }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Team with name %s not found".formatted(name))));
 
             }
+            case "world" -> {
+                if (!player.isOp()) {
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst mehr Rechte tanken."));
+                    return false;
+                }
+
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Current world: %s".formatted(player.getWorld().getName())));
+            }
             default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unknown command"));
         }
 
@@ -104,7 +125,7 @@ public class TeamCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length <= 1) {
-            return completions(sender, List.of("create", "join", "delete"), List.of("tp"));
+            return completions(sender, List.of("create", "join", "delete", "info"), List.of("tp", "world"));
         }
 
         if (args[0].equalsIgnoreCase("tp") && sender.isOp()) {
@@ -112,6 +133,11 @@ public class TeamCommand implements TabExecutor {
                     .map(World::getName)
                     .toList();
         }
+        
+        if (args[0].equalsIgnoreCase("join")) {
+            return plugin.teams().stream().map(Team::name).toList();
+        }
+        
         return List.of();
     }
 
