@@ -39,7 +39,7 @@ public class GameCommand implements CommandExecutor {
         }
 
         if (args.length < 1) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have to use: /game start"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /game start/stop/skip nutzen"));
             return false;
         }
 
@@ -56,6 +56,8 @@ public class GameCommand implements CommandExecutor {
                     LevelPipeline levelPipeline = new LevelPipeline(team, plugin);
                     levelPipeline.start();
                     plugin.teamPipelines().put(team, levelPipeline);
+
+                    plugin.getServer().broadcast(MiniMessage.miniMessage().deserialize("<white><bold>Spiel gestartet!"));
                 }
             }
             case "stop" -> {
@@ -70,10 +72,11 @@ public class GameCommand implements CommandExecutor {
                             playerLocation.setWorld(world);
                             p.teleport(playerLocation);
                         });
-//                plugin.teams().stream().map(Team::world).forEach(w -> plugin.getServer().unloadWorld(w, false));
                 plugin.teamPipelines().clear();
+
+                plugin.getServer().broadcast(MiniMessage.miniMessage().deserialize("<white><bold>Spiel gestoppt!"));
             }
-            case "level" -> {
+            case "skip" -> {
                 Optional<Team> team = plugin.teamForPlayer(player);
                 LevelPipeline pipeline = plugin.teamPipelines().get(team.orElseThrow());
 
@@ -82,7 +85,7 @@ public class GameCommand implements CommandExecutor {
                     pipeline.next();
                 }
             }
-            default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Unknown command."));
+            default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unbekannter Command."));
         }
         return true;
     }

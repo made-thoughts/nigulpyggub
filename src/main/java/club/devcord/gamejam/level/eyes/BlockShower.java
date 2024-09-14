@@ -11,6 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Random;
@@ -39,13 +41,18 @@ public class BlockShower implements Listener {
 
     private void switchItems() {
         team.players().forEach(player -> {
-            if(player.getInventory().getItemInMainHand().isSimilar(TheJumpLevel.THE_EYE) && random.nextInt(0, 100) < 40) {
+            PlayerInventory inventory = player.getInventory();
+            if(inventory.getItemInMainHand().isSimilar(TheJumpLevel.THE_EYE) && random.nextInt(0, 100) < 40) {
                 var newSlot = random.nextInt(0, 8);
-                while(newSlot == player.getInventory().getHeldItemSlot()) {
+                while(inventory.getItem(newSlot) != null
+                        && inventory.getItem(newSlot).isEmpty()) {
                     newSlot = random.nextInt(0, 8);
                 }
 
-                player.getInventory().setItem(player.getInventory().getHeldItemSlot(), );
+                var air = new ItemStack(Material.AIR);
+                inventory.setItem(inventory.getHeldItemSlot(), air);
+                inventory.setItem(newSlot, TheJumpLevel.THE_EYE);
+                setVisibility(player);
             }
         });
     }
@@ -88,7 +95,7 @@ public class BlockShower implements Listener {
         if(itemInHand.isSimilar(TheJumpLevel.THE_EYE)) {
             showBlocks(player, Material.BONE_BLOCK.createBlockData());
         } else {
-            showBlocks(player, Material.AIR.createBlockData());
+            showBlocks(player, Material.BARRIER.createBlockData());
         }
     }
 

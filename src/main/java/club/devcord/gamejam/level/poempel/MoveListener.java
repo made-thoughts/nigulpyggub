@@ -1,11 +1,14 @@
 package club.devcord.gamejam.level.poempel;
 
 import club.devcord.gamejam.Nigulpyggub;
+import club.devcord.gamejam.SantasBellRinger;
 import club.devcord.gamejam.Team;
 import club.devcord.gamejam.level.LevelPipeline;
 import io.papermc.paper.math.BlockPosition;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +19,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 public class MoveListener implements Listener {
@@ -41,7 +47,8 @@ public class MoveListener implements Listener {
     private final Map<String, Set<UUID>> alreadyDone = Map.of(
         "completed", new HashSet<>(),
         "void", new HashSet<>(),
-        "fart", new HashSet<>()
+        "fart", new HashSet<>(),
+        "xmas", new HashSet<>()
     );
     private final LevelPipeline pipeline;
 
@@ -62,6 +69,12 @@ public class MoveListener implements Listener {
             player.sendMultiBlockChange(emptyChunk);
         }
 
+        if (location.blockX() == 152 && location.blockY() == 41 && location.getBlockZ() == -406 && alreadyDone.get("xmas").add(uuid)) {
+            player.playSound(Sound.sound(Key.key("minecraft:item.santabell"), Sound.Source.MASTER, 100, 1));
+
+            player.getInventory().addItem(SantasBellRinger.THE_BELL);
+        }
+
         if (location.blockX() == 152 && location.blockY() == 40 && location.blockZ() == -402 && alreadyDone.get("fart").add(uuid)) {
             player.playSound(Sound.sound(Key.key("minecraft:random.fart1"), Sound.Source.MASTER, 100, 1));
         }
@@ -73,7 +86,9 @@ public class MoveListener implements Listener {
         if (location.blockX() == 146 && location.blockZ() == -410) {
             var newLoc = new Location(player.getWorld(), 150, 42, -410, 180.0F, 15.0F);
             player.teleport(newLoc);
-            player.sendMessage(plugin.exceptionToComponent(new OutOfMemoryError("Java is very hungry..")));
+            OutOfMemoryError throwable = new OutOfMemoryError("Java is very hungry..");
+            throwable.printStackTrace(new PrintWriter(new StringWriter()));
+            player.sendMessage(plugin.exceptionToComponent(throwable));
             player.playSound(Sound.sound(Key.key("minecraft:ambient.toilet"), Sound.Source.MASTER, 100, 1));
         }
 

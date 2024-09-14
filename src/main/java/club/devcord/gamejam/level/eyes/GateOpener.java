@@ -1,5 +1,6 @@
 package club.devcord.gamejam.level.eyes;
 
+import club.devcord.gamejam.Nigulpyggub;
 import club.devcord.gamejam.Team;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -13,28 +14,30 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+
 public class GateOpener implements Listener {
 
     private final Team team;
-    private final
+    private final Nigulpyggub plugin;
 
     private boolean gateOpen = false;
 
-    private boolean first;
-    private boolean second;
-    private boolean third;
-    private boolean forth;
+    private final List<Note> NOTES = List.of(Note.E, Note.C, Note.H, Note.C, Note.E);
 
-    public GateOpener(Team team) {
+    private int counter = 0;
+
+    public GateOpener(Team team, Nigulpyggub plugin) {
         this.team = team;
+        this.plugin = plugin;
     }
 
     private enum Note {
         C, E, H;
 
         private static Note forButton(Location location) {
-            if (isLocation(location, 354, 45, -484)) return E;
             if (isLocation(location, 354, 45, -486)) return C;
+            if (isLocation(location, 354, 45, -484)) return E;
             if (isLocation(location, 354, 45, -482)) return H;
             return null;
         }
@@ -52,7 +55,6 @@ public class GateOpener implements Listener {
             Location location = event.getClickedBlock().getLocation();
 
             Note note = Note.forButton(location);
-            Bukkit.broadcastMessage(note.toString() + "");
             if (note == null) return;
 
             int pitch = switch (note) {
@@ -61,38 +63,17 @@ public class GateOpener implements Listener {
                 case H -> 2;
             };
             Sound sound = Sound.sound(Key.key("minecraft:instrument.sax"), Sound.Source.MASTER, 100, pitch);
-            event.getPlayer().playSound(sound);
+            team.players().forEach(player -> player.playSound(sound));
 
-            if (forth && note == Note.E) {
+            if (NOTES.get(counter) == note) {
+                counter++;
+            } else  {
+                counter = 0;
+            }
+
+            if (counter == 5) {
                 openGate();
-                return;
             }
-
-            if (third && note == Note.C) {
-                forth = true;
-                return;
-            }
-
-            if (second && note == Note.H) {
-                third = true;
-                return;
-            }
-
-            if (first && note == Note.C) {
-                second = true;
-                return;
-            }
-
-            if (!first && note == Note.E) {
-                first = true;
-                return;
-            }
-
-
-            first = false;
-            second = false;
-            third = false;
-            forth = false;
         }
     }
 
@@ -103,16 +84,18 @@ public class GateOpener implements Listener {
         BlockData airData = Material.AIR.createBlockData();
         BlockData ironData = Material.IRON_BARS.createBlockData();
 
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            team.players().forEach(player -> player.playSound(Sound.sound(Key.key("minecraft:ride.coaster.bar_close"), Sound.Source.MASTER, 100, 1)));
+            for (int i = 0; i < 4; i++) {
+                world.setBlockData(355, 45+i, -483, airData);
+                world.setBlockData(355, 45+i, -485, airData);
 
-
-        for (int i = 0; i < 4; i++) {
-            world.setBlockData(355, 45+i, -483, airData);
-            world.setBlockData(355, 45+i, -483, airData);
-
-            for (int j = 0; j < 3; j++) {
-                world.setBlockData(357, 45+i, -482 + j*2, ironData);
+                for (int j = 0; j < 3; j++) {
+                    world.setBlockData(357, 45+i, -482 - j*2, ironData);
+                }
             }
-        }
+        }, 20);
+
     }
 
 

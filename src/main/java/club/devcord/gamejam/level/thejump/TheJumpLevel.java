@@ -17,7 +17,7 @@ public class TheJumpLevel extends Level {
     static {
         THE_EYE = new ItemStack(Material.ENDER_EYE);
         var meta = THE_EYE.getItemMeta();
-        meta.displayName(MiniMessage.miniMessage().deserialize("<rainbow>Sehhilfe"));
+        meta.displayName(MiniMessage.miniMessage().deserialize("<rainbow>Die schüchterne Sehhilfe"));
         THE_EYE.setItemMeta(meta);
     }
 

@@ -7,6 +7,7 @@ import club.devcord.gamejam.level.LevelPipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.PrintWriter;
@@ -20,8 +21,10 @@ public class Nigulpyggub extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-        getServer().getPluginManager().registerEvents(new EventCancelers(), this);
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new PlayerJoinListener(), this);
+        pluginManager.registerEvents(new EventCancelers(this), this);
+        pluginManager.registerEvents(new SantasBellRinger(), this);
         getServer().getPluginCommand("team").setExecutor(new TeamCommand(this));
         getServer().getPluginCommand("game").setExecutor(new GameCommand(this));
 //        lagger.start();

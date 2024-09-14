@@ -45,46 +45,46 @@ public class TeamCommand implements TabExecutor {
             case "delete" -> plugin.teamForName(player.getName())
                     .ifPresentOrElse(team -> {
                         plugin.teams().remove(team);
-                        player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Your team was deleted!"));
-                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You're not the creator of a team.")));
+                        player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Dein Team wurde gelöscht!"));
+                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist in keinem Team!")));
 
             case "create" -> {
                 boolean alreadyInTeam = plugin.teamForPlayer(player).isPresent();
 
                 if (alreadyInTeam) {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You are already in a team!"));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist schon in einem Team!"));
                     return true;
                 }
 
                 World teamWorld = duplicator.duplicate(player.getName());
                 Team team = new Team(player, teamWorld);
                 plugin.teamPipelines().put(team, null);
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team with name %s created".formatted(player.getName())));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team %s erstellt.".formatted(player.getName())));
             }
             case "join" -> {
                 if (args.length != 2) {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have to use: /team join <creator>"));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /team join <name> nutzen!"));
                     return false;
                 }
                 
                 if(plugin.teamForPlayer(player).isPresent()) {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You are already in a team!"));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist schon in einem Team!"));
                     return false;
                 }
 
                 plugin.teamForName(args[1]).ifPresentOrElse(team -> {
-                    team.players().forEach(p -> p.sendMessage(MiniMessage.miniMessage().deserialize("<green>%s joined the team".formatted(player.getName()))));
+                    team.players().forEach(p -> p.sendMessage(MiniMessage.miniMessage().deserialize("<green>%s ist dem Team beigetreten.".formatted(player.getName()))));
                     team.addPlayer(player);
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<green>You joined the team %s".formatted(team.name())));
-                }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>No team found for creator %s".formatted(args[1]))));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Du bist dem Team %s beigetreten.".formatted(team.name())));
+                }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Kein Team mit dem Namen %s gefunden.".formatted(args[1]))));
             }
             case "info" -> plugin.teamForPlayer(player)
                     .ifPresentOrElse(team -> {
-                        TextComponent text = Component.text("Your team: %s".formatted(team.name()))
+                        TextComponent text = Component.text("Dein Team: %s".formatted(team.name()))
                                 .append(Component.newline())
-                                .append(Component.text("Members: %s".formatted(team.players().stream().map(Player::getName).collect(Collectors.joining(", ")))));
+                                .append(Component.text("Mitglieder: %s".formatted(team.players().stream().map(Player::getName).collect(Collectors.joining(", ")))));
                         player.sendMessage(text);
-                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You're not in a team!")));
+                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist nicht in einem Team!")));
             case "tp" -> {
                 if (!player.isOp()) {
                     player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst mehr Rechte tanken."));
@@ -92,7 +92,7 @@ public class TeamCommand implements TabExecutor {
                 }
 
                 if (args.length != 2) {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have to use: /team tp <team>"));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /team tp <team/welt> nutzen"));
                 }
                 String name = args[1];
 
@@ -104,8 +104,8 @@ public class TeamCommand implements TabExecutor {
                             playerLocation.setWorld(world);
                             player.teleport(playerLocation);
 
-                            player.sendMessage(MiniMessage.miniMessage().deserialize("You were teleport to world %s".formatted(world.getName())));
-                        }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Team with name %s not found".formatted(name))));
+                            player.sendMessage(MiniMessage.miniMessage().deserialize("Du wurdest zur Welt %s teleportiert.".formatted(world.getName())));
+                        }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red> Team mit name %s nicht gefunden.".formatted(name))));
 
             }
             case "world" -> {
@@ -114,9 +114,9 @@ public class TeamCommand implements TabExecutor {
                     return false;
                 }
 
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Current world: %s".formatted(player.getWorld().getName())));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Derzeitige Welt: %s".formatted(player.getWorld().getName())));
             }
-            default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unknown command"));
+            default -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unbekannter Befehl."));
         }
 
         return false;
@@ -125,29 +125,36 @@ public class TeamCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length <= 1) {
-            return completions(sender, List.of("create", "join", "delete", "info"), List.of("tp", "world"));
+            return completions(sender, label, List.of("create", "join", "delete", "info"), List.of("tp", "world"));
         }
 
         if (args[0].equalsIgnoreCase("tp") && sender.isOp()) {
             return plugin.getServer().getWorlds().stream()
                     .map(World::getName)
+                    .filter(s -> s.startsWith(args[0]))
                     .toList();
         }
         
         if (args[0].equalsIgnoreCase("join")) {
-            return plugin.teams().stream().map(Team::name).toList();
+            return plugin.teams().stream()
+                    .map(Team::name)
+                    .filter(s -> s.startsWith(args[0]))
+                    .toList();
         }
         
         return List.of();
     }
 
-    private List<String> completions(CommandSender player, List<String> normal, List<String> admin) {
+    private List<String> completions(CommandSender player, String current, List<String> normal, List<String> admin) {
         if (!player.isOp()) {
             return normal;
         }
 
         ArrayList<String> strings = new ArrayList<>(normal);
         strings.addAll(admin);
-        return strings;
+        return strings
+                .stream()
+                .filter(s -> s.startsWith(current))
+                .toList();
     }
 }
