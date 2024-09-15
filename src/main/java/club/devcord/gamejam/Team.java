@@ -5,16 +5,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public record Team(
         String name,
-        List<UUID> playerUUIDS,
+        Set<UUID> playerUUIDS,
         World world,
         TextColor color
 ) {
@@ -27,8 +24,8 @@ public record Team(
         return TextColor.color(red, yellow, blue);
     }
 
-    public Team(Player creator, World world) {
-        this(creator.getName(), new ArrayList<>(), world, randomColor());
+    public Team(String name, Player creator, World world) {
+        this(name, new HashSet<>(), world, randomColor());
         playerUUIDS.add(creator.getUniqueId());
     }
 
@@ -37,10 +34,15 @@ public record Team(
         return playerUUIDS
                 .stream()
                 .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
     public void addPlayer(Player player) {
         playerUUIDS.add(player.getUniqueId());
+    }
+
+    public void removePlayer(Player player) {
+        playerUUIDS.remove(player.getUniqueId());
     }
 }

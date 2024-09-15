@@ -48,6 +48,7 @@ public class GameCommand implements CommandExecutor {
         switch (args[0].toLowerCase()) {
             case "start" -> {
                 BukkitScheduler scheduler = plugin.getServer().getScheduler();
+                plugin.setInGame(true);
                 for (Team team : plugin.teams()) {
                     team.players().forEach(teamPlayer -> {
                         teamPlayer.setGameMode(GameMode.ADVENTURE);
@@ -74,6 +75,7 @@ public class GameCommand implements CommandExecutor {
                 }
             }
             case "stop" -> {
+                plugin.setInGame(false);
                 plugin.teams()
                         .stream()
                         .peek(team -> plugin.teamPipelines().get(team).stop())
@@ -82,6 +84,8 @@ public class GameCommand implements CommandExecutor {
                         .forEach(p -> {
                             p.teleport(new Location(plugin.getServer().getWorld("world"), 90, 43, -475));
                             p.getInventory().clear();
+                            p.setFlying(false);
+                            p.setAllowFlight(false);
                         });
                 plugin.teamPipelines().clear();
 

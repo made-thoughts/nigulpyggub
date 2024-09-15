@@ -36,19 +36,37 @@ public class TeamCommand implements TabExecutor {
         if (!(sender instanceof Player player)) return true;
 
         if (args.length < 1) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have to use: /team create"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /team create <name>, /team leave oder /team join <name> nutzen"));
             return false;
         }
 
         switch (args[0].toLowerCase()) {
+            case "leave" -> {
+                if (plugin.inGame()) {
+                    sendInGame(player);
+                    return false;
+                }
 
-            case "delete" -> plugin.teamForName(player.getName())
-                    .ifPresentOrElse(team -> {
-                        plugin.teams().remove(team);
-                        player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Dein Team wurde gelöscht!"));
-                    }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist in keinem Team!")));
+                plugin.teamForPlayer(player)
+                        .ifPresentOrElse(team -> {
+                            if (team.players().size() == 1) {
+                                plugin.teamPipelines().remove(team);
+                            }
+
+                            team.removePlayer(player);
+
+                            player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Du hast das Team verlassen!"));
+
+                            player.playerListName(player.name());
+                        }, () -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du bist in keinem Team!")));
+            }
 
             case "create" -> {
+                if (plugin.inGame()) {
+                    sendInGame(player);
+                    return false;
+                }
+
                 boolean alreadyInTeam = plugin.teamForPlayer(player).isPresent();
 
                 if (alreadyInTeam) {
@@ -56,12 +74,28 @@ public class TeamCommand implements TabExecutor {
                     return true;
                 }
 
-                World teamWorld = duplicator.duplicate(player.getName());
-                Team team = new Team(player, teamWorld);
-                plugin.teamPipelines().put(team, null);
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team %s erstellt.".formatted(player.getName())));
+                if (args.length != 2) {
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /team create <name> nutzen!"));
+                    return false;
+                }
+
+                String teamName = args[1];
+
+                plugin.teamForName(teamName)
+                        .ifPresentOrElse(team -> player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Team mit Namen %s existiert bereits.".formatted(teamName))),
+                                () -> {
+                                    World teamWorld = duplicator.duplicate(teamName);
+                                    Team team = new Team(teamName, player, teamWorld);
+                                    plugin.teamPipelines().put(team, null);
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize("<green>Team %s erstellt.".formatted(teamName)));
+                                });
             }
             case "join" -> {
+                if (plugin.inGame()) {
+                    sendInGame(player);
+                    return false;
+                }
+
                 if (args.length != 2) {
                     player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du musst: /team join <name> nutzen!"));
                     return false;
@@ -125,7 +159,7 @@ public class TeamCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length <= 1) {
-            return completions(sender, args[0], List.of("create", "join", "delete", "info"), List.of("tp", "world"));
+            return completions(sender, args[0], List.of("create", "join", "leave", "info"), List.of("tp", "world"));
         }
 
         if (args[0].equalsIgnoreCase("tp") && sender.isOp()) {
@@ -156,5 +190,9 @@ public class TeamCommand implements TabExecutor {
                 .stream()
                 .filter(s -> s.startsWith(current))
                 .toList();
+    }
+
+    private void sendInGame(CommandSender sender) {
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Du kannst dein Team nicht ändern, solange das Spiel läuft."));
     }
 }

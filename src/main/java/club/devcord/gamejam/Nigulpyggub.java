@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Nigulpyggub extends JavaPlugin {
 
+    private boolean inGame = false;
     private final Map<Team, LevelPipeline> teamPipelines = new HashMap<>();
 
     @Override
@@ -29,7 +30,14 @@ public class Nigulpyggub extends JavaPlugin {
         getServer().getPluginCommand("game").setExecutor(new GameCommand(this));
 
         new TabList(this).start();
-//        lagger.start();
+    }
+
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
+    }
+
+    public boolean inGame() {
+        return inGame;
     }
 
     public Optional<Team> teamForName(String name) {
