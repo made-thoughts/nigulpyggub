@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GateOpener implements Listener {
@@ -24,8 +25,7 @@ public class GateOpener implements Listener {
     private boolean gateOpen = false;
 
     private final List<Note> NOTES = List.of(Note.E, Note.C, Note.H, Note.C, Note.E);
-
-    private int counter = 0;
+    private final List<Note> lastClickedNotes = new ArrayList<>();
 
     public GateOpener(Team team, Nigulpyggub plugin) {
         this.team = team;
@@ -65,13 +65,12 @@ public class GateOpener implements Listener {
             Sound sound = Sound.sound(Key.key("minecraft:instrument.sax"), Sound.Source.MASTER, 100, pitch);
             team.players().forEach(player -> player.playSound(sound));
 
-            if (NOTES.get(counter) == note) {
-                counter++;
-            } else  {
-                counter = 0;
+            lastClickedNotes.addLast(note);
+            if(lastClickedNotes.size() > 5) {
+                lastClickedNotes.removeFirst();
             }
 
-            if (counter == 5) {
+            if (lastClickedNotes.equals(NOTES)) {
                 openGate();
             }
         }
