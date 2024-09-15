@@ -8,6 +8,7 @@ import club.devcord.gamejam.level.thejump.TheJumpLevel;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
@@ -46,7 +47,10 @@ public class LevelPipeline {
             team.players().forEach(
                     p -> p.playSound(Sound.sound(Key.key("minecraft:effect.achievementcompleted"), Sound.Source.MASTER, 100, 1))
             );
+
             levels.peek().start();
+
+            showLevelTitle();
         } else {
             endTime = Instant.now();
             team.players().forEach(player -> {
@@ -65,10 +69,15 @@ public class LevelPipeline {
         }
     }
 
+    private void showLevelTitle() {
+        team.players().forEach(player -> player.showTitle(Title.title(Component.text("Level %s".formatted(level())).color(NamedTextColor.AQUA), Component.empty())));
+    }
+
 
     public void start() {
         levels.peek().start();
         startTime = Instant.now();
+        showLevelTitle();
     }
 
     public int level() {

@@ -45,7 +45,7 @@ public class BlockShower implements Listener {
             if(inventory.getItemInMainHand().isSimilar(TheJumpLevel.THE_EYE) && random.nextInt(0, 100) < 40) {
                 var newSlot = random.nextInt(0, 8);
                 while(inventory.getItem(newSlot) != null
-                        && inventory.getItem(newSlot).isEmpty()) {
+                        && !inventory.getItem(newSlot).isEmpty()) {
                     newSlot = random.nextInt(0, 8);
                 }
 

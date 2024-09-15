@@ -66,8 +66,6 @@ public class GameCommand implements CommandExecutor {
                     });
 
                     scheduler.runTaskLater(plugin, () -> {
-                        team.players().forEach(p -> p.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<rainbow>Jetzt"), Component.empty())));
-
                         LevelPipeline levelPipeline = new LevelPipeline(team, plugin);
                         levelPipeline.start();
                         plugin.teamPipelines().put(team, levelPipeline);
