@@ -16,7 +16,8 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         player.sendMessage(MiniMessage.miniMessage().deserialize("<rainbow><bold>Willkommen in unserem kleinen Themenpark!"));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("<blue><bold>Nutze /team create um ein Team zu erstellen oder /team join <name> um einem Team beizutreten!"));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<blue><bold>Nutze /team create <name> um ein Team zu erstellen oder /team join <name> um einem Team beizutreten!"));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gold><bold>Das Minigame setzt sich aus mehreren Leveln zusammen, welche jeweils ein bestimmtes Ziel haben. Dieses Ziel kannst du zum Anfang eines Levels im Chat nachlesen. Viel mehr zu beachten gibt es nicht. Have fun!"));
 
         if(!player.isOp()) {
             player.setGameMode(GameMode.ADVENTURE);
