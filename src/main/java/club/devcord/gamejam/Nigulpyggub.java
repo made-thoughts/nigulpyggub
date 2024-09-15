@@ -27,6 +27,8 @@ public class Nigulpyggub extends JavaPlugin {
         pluginManager.registerEvents(new SantasBellRinger(), this);
         getServer().getPluginCommand("team").setExecutor(new TeamCommand(this));
         getServer().getPluginCommand("game").setExecutor(new GameCommand(this));
+
+        new TabList(this).start();
 //        lagger.start();
     }
 

@@ -1,10 +1,12 @@
 package club.devcord.gamejam;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -34,7 +36,11 @@ public class EventCancelers implements Listener {
     }
 
     @EventHandler
-    public void onEndereye(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getPlayer().getLocation().getWorld().getName().equals("world") && event.getPlayer().getGameMode() == GameMode.ADVENTURE && event.getAction() != Action.RIGHT_CLICK_AIR) {
+            event.setCancelled(true);
+        }
+
         if (event.getMaterial().equals(Material.ENDER_EYE) &&
                 (event.getClickedBlock() == null || event.getClickedBlock().getType() != Material.END_PORTAL_FRAME)) {
             Exception exception = dasAugeBrauchstDuNoch();

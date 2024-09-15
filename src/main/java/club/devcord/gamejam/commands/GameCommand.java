@@ -7,15 +7,17 @@ import club.devcord.gamejam.level.LevelPipeline;
 import club.devcord.gamejam.level.poempel.PoempelLevel;
 import club.devcord.gamejam.world.WorldDuplicator;
 import io.papermc.paper.configuration.type.fallback.FallbackValue;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
+import net.kyori.adventure.title.Title;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -45,36 +47,47 @@ public class GameCommand implements CommandExecutor {
 
         switch (args[0].toLowerCase()) {
             case "start" -> {
+                BukkitScheduler scheduler = plugin.getServer().getScheduler();
                 for (Team team : plugin.teams()) {
                     team.players().forEach(teamPlayer -> {
                         teamPlayer.setGameMode(GameMode.ADVENTURE);
                         Location playerLocation = teamPlayer.getLocation();
                         playerLocation.setWorld(team.world());
+                        teamPlayer.setFlying(false);
+                        teamPlayer.setAllowFlight(false);
                         teamPlayer.teleport(playerLocation);
+                        teamPlayer.playSound(net.kyori.adventure.sound.Sound.sound(Key.key("minecraft:minigame.autopia.countdown"), Sound.Source.MASTER, 100, 1));
+
+                        for (int i = 0; i < 3; i++) {
+                            int count = 3 - i;
+                            scheduler.runTaskLater(plugin, () -> teamPlayer.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<rainbow>Spiel startet in..."), MiniMessage.miniMessage().deserialize("<white><bold>" + count))), 20 * i);
+                        }
                     });
 
-                    LevelPipeline levelPipeline = new LevelPipeline(team, plugin);
-                    levelPipeline.start();
-                    plugin.teamPipelines().put(team, levelPipeline);
+                    scheduler.runTaskLater(plugin, () -> {
+                        team.players().forEach(p -> p.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<rainbow>Jetzt"), Component.empty())));
 
-                    plugin.getServer().broadcast(MiniMessage.miniMessage().deserialize("<white><bold>Spiel gestartet!"));
+                        LevelPipeline levelPipeline = new LevelPipeline(team, plugin);
+                        levelPipeline.start();
+                        plugin.teamPipelines().put(team, levelPipeline);
+                    }, 60);
                 }
             }
             case "stop" -> {
-                var world = plugin.getServer().getWorld("world");
                 plugin.teams()
                         .stream()
                         .peek(team -> plugin.teamPipelines().get(team).stop())
                         .map(Team::players)
                         .flatMap(List::stream)
                         .forEach(p -> {
-                            Location playerLocation = p.getLocation();
-                            playerLocation.setWorld(world);
-                            p.teleport(playerLocation);
+                            p.teleport(new Location(plugin.getServer().getWorld("world"), 90, 43, -475));
+                            p.getInventory().clear();
                         });
                 plugin.teamPipelines().clear();
 
-                plugin.getServer().broadcast(MiniMessage.miniMessage().deserialize("<white><bold>Spiel gestoppt!"));
+                plugin.getServer().broadcast(MiniMessage.miniMessage().deserialize("<red><bold>Spiel gestoppt!"));
+
+                plugin.getServer().getOnlinePlayers().forEach(player1 -> player1.playerListName(player1.name()));
             }
             case "skip" -> {
                 Optional<Team> team = plugin.teamForPlayer(player);

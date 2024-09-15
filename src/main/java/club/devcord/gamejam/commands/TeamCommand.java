@@ -125,20 +125,20 @@ public class TeamCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length <= 1) {
-            return completions(sender, label, List.of("create", "join", "delete", "info"), List.of("tp", "world"));
+            return completions(sender, args[0], List.of("create", "join", "delete", "info"), List.of("tp", "world"));
         }
 
         if (args[0].equalsIgnoreCase("tp") && sender.isOp()) {
             return plugin.getServer().getWorlds().stream()
                     .map(World::getName)
-                    .filter(s -> s.startsWith(args[0]))
+                    .filter(s -> s.startsWith(args[1]))
                     .toList();
         }
         
         if (args[0].equalsIgnoreCase("join")) {
             return plugin.teams().stream()
                     .map(Team::name)
-                    .filter(s -> s.startsWith(args[0]))
+                    .filter(s -> s.startsWith(args[1]))
                     .toList();
         }
         
